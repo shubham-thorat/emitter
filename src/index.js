@@ -1,5 +1,7 @@
 const { Emitter } = require("@socket.io/redis-emitter");
 const Redis = require('ioredis');
+// const Redis = require('redis');
+
 
 /**
  * Generates ids of rooms
@@ -40,15 +42,19 @@ const schemaMessage = {
 
 function run() {
     const rooms = getRooms(1);
+    console.log('rooms : ', rooms)
 
     let messageId = 1;
 
-    const messageFiringRate = 10;
+    const messageFiringRate = 1000;
     const minutes = 5;
 
     const intervalId = setInterval(() => {
+        console.log('message is being fired')
         for (const room of rooms) {
-            io.to(room).emit('price_change', schemaMessage);
+            // console.log(first)
+            let check = io.to(room).emit('price_change', schemaMessage);
+            console.log('check : ', room, " ", check)
             ++messageId;
         }
     }, messageFiringRate);
@@ -58,6 +64,11 @@ function run() {
         console.log('All messaged emitted!');
         process.exit(0);
     }, minutes * 60 * 1000);
+
+    // for (const room of rooms) {
+    //     let check = io.to(room).emit('price_change', schemaMessage);
+    //     console.log('message fired')
+    // }
 }
 
 run();
