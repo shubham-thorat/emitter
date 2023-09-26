@@ -125,7 +125,7 @@ const data3 = {
   'packet': {
     'uid': v4(),
     'data': [
-      'room1',
+      'loadtest',
       {
         'open_price': "100",
         'high_price': "120",
