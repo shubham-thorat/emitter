@@ -49,15 +49,15 @@ function run() {
     const messageFiringRate = 1000;
     const minutes = 5;
 
-    const intervalId = setInterval(() => {
-        console.log('message is being fired')
-        for (const room of rooms) {
-            // console.log(first)
-            let check = io.to(room).emit('price_change', schemaMessage);
-            console.log('check : ', room, " ", check)
-            ++messageId;
-        }
-    }, messageFiringRate);
+    // const intervalId = setInterval(() => {
+    //     console.log('message is being fired')
+    for (const room of rooms) {
+        // console.log(first)
+        let check = io.to(room).emit('price_change', schemaMessage);
+        console.log('check : ', room, " ", check)
+        ++messageId;
+    }
+    // }, messageFiringRate);
 
     setTimeout(() => {
         clearInterval(intervalId);

@@ -9,7 +9,7 @@ const redisClient = createClient({
   socket: {
     host: '172.31.32.148',
     port: 6379,
-    url: 'redis://172.31.32.148:4000'
+    url: 'redis://172.31.32.148:6379'
   }
 })
 
@@ -52,11 +52,112 @@ let schemaMessage = {
   'event_number': '1',
   'event_number_secondary': '2',
   'opts': {
-    rooms: ['room1'],
-    except: [],
-    flags: false,
+    'rooms': ['room1'],
+    'except': [],
+    'flags': {},
+  },
+  'packet': {
+    'open_price': "100",
+    'high_price': "120",
+    'low_price': "89",
+    'close_price': "102",
+    'last_trade_price': "95",
+    'event_name': "stock",
+    'event_desc': "change",
+    'event_title': "stock price",
+    'event_number': '1',
+    'event_number_secondary': '2',
   }
 };
+
+const data = {
+  // 'packet': {
+  // 'data': {
+  'open_price': "100",
+  'high_price': "120",
+  'low_price': "89",
+  'close_price': "102",
+  'last_trade_price': "95",
+  'event_name': "stock",
+  'event_desc': "change",
+  'event_title': "stock price",
+  'event_number': '1',
+  'event_number_secondary': '9',
+  // },
+  // 'type': '9'
+  // },
+  // 'opts': {
+  //   'rooms': ['room1'],
+  //   'except': [],
+  //   'flags': {},
+  // }
+}
+
+const data2 = [
+  // 'packet': {
+  // 'data': {
+  'room1',
+  {
+    'open_price': "100",
+    'high_price': "120",
+    'low_price': "89",
+    'close_price': "102",
+    'last_trade_price': "95",
+    'event_name': "stock",
+    'event_desc': "change",
+    'event_title': "stock price",
+    'event_number': '1',
+    'event_number_secondary': '9',
+  }
+  // },
+  // 'type': '9'
+  // },
+  // 'opts': {
+  //   'rooms': ['room1'],
+  //   'except': [],
+  //   'flags': {},
+  // }
+]
+
+
+
+const data3 = {
+  'packet': {
+    'uid': v4(),
+    'data': [
+      'room1',
+      {
+        'open_price': "100",
+        'high_price': "120",
+        'low_price': "89",
+        'close_price': "102",
+        'last_trade_price': "95",
+        'event_name': "stock",
+        'event_desc': "change",
+        'event_title': "stock price",
+        'event_number': '1',
+        'event_number_secondary': '9'
+      }
+    ],
+    'type': '2',
+    'nsp': '/'
+  },
+  'opts': {
+    'rooms': ['room1'],
+    'except': [],
+    'flags': {},
+  }
+}
+
+let message = {
+  'type': '3',
+  'uid': v4(),
+  'nsp': '/',
+  'data': JSON.stringify(data3)
+}
+
+
+
 
 function run() {
   // const rooms = getRooms(1);
@@ -65,21 +166,16 @@ function run() {
   // let messageId = 1;
 
   const messageFiringRate = 1000;
-  const minutes = 5;
+  const seconds = 30;
 
   const intervalId = setInterval(() => {
+    // for (let i = 0; i < 10; i++) {
     // console.log('keys is being added to stream socket.io')
     // redisClient.xAdd('socket.io', "*", 'key', JSON.stringify(schemaMessage)).then(id => {
     //   console.log('id : ', id)
     // });
 
-    redisClient.xAdd('mystream', '*', {
-      'type': '3',
-      'uid': v4(),
-      'nsp': '/',
-      'diff': 'true',
-      'data': JSON.stringify(schemaMessage)
-    }, {
+    redisClient.xAdd('socket.io', '*', message, {
       //return true if key is not present
       // 'NOMKSTREAM': true,
     }).then(id => {
@@ -87,6 +183,17 @@ function run() {
     }).catch(error => {
       console.log(`Error while adding keys to stream : ${error}`)
     });
+
+
+
+    // redisClient.xAdd('socket.io', '*', message, {
+    //   //return true if key is not present
+    //   // 'NOMKSTREAM': true,
+    // }).then(id => {
+    //   console.log(`Key added to stream with socketId: ${id}`)
+    // }).catch(error => {
+    //   console.log(`Error while adding keys to stream : ${error}`)
+    // });
 
     // redisClient.xadd('socket.io', '*', 'key', JSON.stringify(schemaMessage))
 
@@ -128,13 +235,14 @@ function run() {
     //     threshold: this.#opts.maxLen,
     //   },
     // });
+    // }
   }, messageFiringRate);
 
   setTimeout(() => {
     clearInterval(intervalId);
     console.log('All messaged emitted!');
     process.exit(0);
-  }, minutes * 60 * 1000);
+  }, seconds * 1000);
 
   // for (const room of rooms) {
   //     let check = io.to(room).emit('price_change', schemaMessage);
